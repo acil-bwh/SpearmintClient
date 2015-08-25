@@ -47,7 +47,9 @@ class Experiment:
             return r['params']
 
     def update(self, param_values, outcome_val):
-        api_params = {'name': self.name, 'outcome_val': outcome_val}
+        api_params = {'name': self.name,
+                      'param_values': param_values,
+                      'outcome_val': outcome_val}
         r = self.call_api('post_update', method='post', params=api_params)
         if 'error' in r:
             raise RuntimeError('failed to post update to spearmint. error: ' + r['error'])
