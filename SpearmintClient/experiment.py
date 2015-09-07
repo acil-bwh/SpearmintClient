@@ -1,5 +1,6 @@
 import json
 import requests
+import importlib
 
 API_URL = 'http://spmint.airwayinspector.org/api'
 #API_URL = 'http://localhost:8000/api'
@@ -11,10 +12,8 @@ class Experiment:
                  parameters=None,
                  outcome=None,
                  access_token=None,
-                 likelihood='GAUSSIAN'): # other option is NOISELESS
-        self.name = name
-        self.parameters = parameters
-        self.outcome = outcome
+                 likelihood='GAUSSIAN', # other option is NOISELESS
+                 run_mode='WEB'): # other option is LOCAL
         self.access_token = access_token
         api_params = {'name': name}
         r = self.call_api('find_experiment', method='get', params=api_params)
@@ -28,6 +27,17 @@ class Experiment:
                 raise RuntimeError('failed to create experiment ' + name + '. error: ' + r['error'])
             else:
                 print 'experiment ' + name + ' was created.'
+        self.username = r['username']
+        if run_mode.upper() == 'LOCAL':
+            spearmint = importlib.import_module('spearmint') # import spearmint only if needed
+            self.experiment = spearmint.Experiment(self.username + '.' + name,
+                                                   description,
+                                                   parameters,
+                                                   outcome,
+                                                   access_token,
+                                                   likelihood)
+        else:
+            self.experiment = WebExperiment(name, access_token)
 
     def call_api(self, name, method, params):
         url = '{0}/{1}/'.format(API_URL, name)
@@ -37,6 +47,19 @@ class Experiment:
         elif method.lower() == 'get':
             r = requests.get(url, headers=headers, params=params)
         return r.json()
+
+    def suggest(self):
+        return self.experiment.suggest()
+
+    def update(self, param_values, outcome_val):
+        return self.experiment.update(param_values, outcome_val)
+
+class WebExperiment(Experiment):
+    """ use web APIs to perform spearmint operations
+    """
+    def __init__(self, name, access_token=None):
+        self.name = name
+        self.access_token = access_token
 
     def suggest(self):
         api_params = {'name': self.name}
