@@ -20,12 +20,12 @@ parameters = {'x':{'min':-5, 'max':10, 'type':'float'},
 outcome = {'name':'Function_Value', 'minimize':True} # additional outcome parameter 'minimize'
 access_token = '1ErTbMOLw6cNo7n3p8CgnNEPjGmq4O' # local root
 
-scientist = SpearmintClient.Experiment(name="branin_tuner",
+scientist = SpearmintClient.Experiment(name="branin_tuner3",
                                        description="Tuning a simple Spearmint example",
                                        parameters=parameters,
                                        outcome=outcome,
                                        access_token=access_token,
-                                       run_mode='local') # default run_mode = 'web'
+                                       run_mode='local') # default run_mode = 'local' (requires local spearmint installation)
 
 for i in range(5):
     # Get a hyperparameter suggestion from Whetlab
