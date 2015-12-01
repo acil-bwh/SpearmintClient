@@ -13,7 +13,7 @@ class Experiment:
                  outcome=None,
                  access_token=None,
                  likelihood='GAUSSIAN', # other option is NOISELESS
-                 run_mode='WEB'): # other option is LOCAL
+                 run_mode='LOCAL'): # other option is WEB
         self.access_token = access_token
         api_params = {'name': name}
         r = self.call_api('find_experiment', method='get', params=api_params)
