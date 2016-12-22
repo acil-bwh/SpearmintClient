@@ -2,7 +2,7 @@ import json
 import requests
 import importlib
 
-API_URL = 'http://spmint.airwayinspector.org/api'
+API_URL = 'http://spmint.chestimagingplatform.org/api'
 #API_URL = 'http://localhost:8000/api'
 
 class Experiment:
