@@ -2,8 +2,9 @@ import json
 import requests
 import importlib
 
-API_URL = 'http://spmint.chestimagingplatform.org/api'
-#API_URL = 'http://localhost:8000/api'
+remote_api="http://spmint.chestimagingplatform.org/api"
+local_api="http://localhost:8000/api"
+
 
 class Experiment:
     def __init__(self,
@@ -12,9 +13,11 @@ class Experiment:
                  parameters=None,
                  outcome=None,
                  access_token=None,
+                 api_url=local_api,
                  likelihood='GAUSSIAN', # other option is NOISELESS
                  run_mode='LOCAL'): # other option is WEB
         self.access_token = access_token
+        self.api_url=api_url
         api_params = {'name': name}
         r = self.call_api('find_experiment', method='get', params=api_params)
         if (r['result']): # found experiment
@@ -29,18 +32,22 @@ class Experiment:
                 print 'experiment ' + name + ' was created.'
         self.username = r['username']
         if run_mode.upper() == 'LOCAL':
+            #Get Spearmint MongoDB credentials from Server
+            r = self.call_api('get_mongodb_uri',method='get',params={})
+            db_uri=r['db_uri']
             spearmint = importlib.import_module('spearmint') # import spearmint only if needed
             self.experiment = spearmint.Experiment(self.username + '.' + name,
-                                                   description,
-                                                   parameters,
-                                                   outcome,
-                                                   access_token,
-                                                   likelihood)
+                                                   description=description,
+                                                   parameters=parameters,
+                                                   outcome=outcome,
+                                                   access_token=access_token,
+                                                   db_uri=db_uri,
+                                                   likelihood=likelihood)
         else:
             self.experiment = WebExperiment(name, access_token)
 
     def call_api(self, name, method, params):
-        url = '{0}/{1}/'.format(API_URL, name)
+        url = '{0}/{1}/'.format(self.api_url, name)
         headers = {'Authorization': 'Bearer ' + self.access_token}
         if method.lower() == 'post':
             r = requests.post(url, headers=headers, data=json.dumps(params))
