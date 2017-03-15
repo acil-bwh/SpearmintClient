@@ -13,7 +13,7 @@ class Experiment:
                  parameters=None,
                  outcome=None,
                  access_token=None,
-                 api_url=local_api,
+                 api_url=remote_api,
                  likelihood='GAUSSIAN', # other option is NOISELESS
                  run_mode='LOCAL'): # other option is WEB
         self.access_token = access_token
