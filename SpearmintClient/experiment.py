@@ -44,7 +44,7 @@ class Experiment:
                                                    db_uri=db_uri,
                                                    likelihood=likelihood)
         else:
-            self.experiment = WebExperiment(name, access_token)
+            self.experiment = WebExperiment(name, access_token,api_url)
 
     def call_api(self, name, method, params):
         url = '{0}/{1}/'.format(self.api_url, name)
@@ -64,10 +64,10 @@ class Experiment:
 class WebExperiment(Experiment):
     """ use web APIs to perform spearmint operations
     """
-    def __init__(self, name, access_token=None):
+    def __init__(self, name, access_token=None,api_url=remote_api):
         self.name = name
         self.access_token = access_token
-
+        self.api_url = api_url
     def suggest(self):
         api_params = {'name': self.name}
         r = self.call_api('get_suggestion', method='get', params=api_params)
