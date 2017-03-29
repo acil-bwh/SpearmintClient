@@ -13,11 +13,13 @@ class Experiment:
                  parameters=None,
                  outcome=None,
                  access_token=None,
-                 api_url=remote_api,
+                 api_url=local_api,
                  likelihood='GAUSSIAN', # other option is NOISELESS
                  run_mode='LOCAL'): # other option is WEB
         self.access_token = access_token
         self.api_url=api_url
+        self.name = name
+        self.run_mode=run_mode
         api_params = {'name': name}
         r = self.call_api('find_experiment', method='get', params=api_params)
         if (r['result']): # found experiment
@@ -56,7 +58,17 @@ class Experiment:
         return r.json()
 
     def suggest(self):
-        return self.experiment.suggest()
+        if self.run_mode.upper() == 'LOCAL':
+            params=self.experiment.get_params()
+            #Get job_id from API in the Server so the serve manage the asignation
+            #so we can support multiple concurrent suggest request
+            web_api=WebExperiment(self.name, self.access_token,self.api_url)
+            job_id =web_api.get_next_job_id()
+            params_simple=self.experiment.create_job(job_id,params)
+        else:
+            params_simple=self.experiment.suggest()
+
+        return params_simple
 
     def update(self, param_values, outcome_val):
         return self.experiment.update(param_values, outcome_val)
@@ -83,3 +95,12 @@ class WebExperiment(Experiment):
         r = self.call_api('post_update', method='post', params=api_params)
         if 'error' in r:
             raise RuntimeError('failed to post update to spearmint. error: ' + r['error'])
+
+    def get_next_job_id(self):
+        api_params = {'name': self.name }
+        r = self.call_api('get_next_job_id', method='get', params=api_params)
+
+        if 'error' in r:
+            raise RuntimeError('failed to get next job id from spearmint. error: ' + r['error'])
+        else:
+            return r['job_id']
