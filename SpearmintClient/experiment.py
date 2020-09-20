@@ -23,7 +23,7 @@ class Experiment:
         api_params = {'name': name}
         r = self.call_api('find_experiment', method='get', params=api_params)
         if (r['result']): # found experiment
-            print 'resuming experiment ' + name + '...'
+            print('resuming experiment ' + name + '...')
         else:
             api_params['parameters'] = parameters
             api_params['outcome'] = outcome
@@ -31,7 +31,7 @@ class Experiment:
             if 'error' in r:
                 raise RuntimeError('failed to create experiment ' + name + '. error: ' + r['error'])
             else:
-                print 'experiment ' + name + ' was created.'
+                print('experiment ' + name + ' was created.')
         self.username = r['username']
         if run_mode.upper() == 'LOCAL':
             #Get Spearmint MongoDB credentials from Server
