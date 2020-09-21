@@ -9,7 +9,7 @@ def branin(x, y):
 
     result = float(result)
 
-    print 'Result = %f' % result
+    print('Result = %f' % result)
     #time.sleep(np.random.randint(60))
     return result
 
